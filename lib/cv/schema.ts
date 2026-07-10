@@ -1,6 +1,13 @@
 import { z } from "zod";
 
-export const templateSchema = z.enum(["classic", "modern", "minimal"]);
+export const templateSchema = z.enum([
+  "classic",
+  "modern",
+  "minimal",
+  "ats",
+  "developer",
+  "executive",
+]);
 export const languageSchema = z.enum(["es", "en"]);
 export const toneSchema = z.enum(["technical", "executive", "creative"]);
 
@@ -10,6 +17,7 @@ export const personalSchema = z.object({
   phone: z.string().trim().min(6, "Ingresa un teléfono válido."),
   location: z.string().trim().min(2, "Ingresa una ubicación."),
   linkedIn: z.string().trim().optional().or(z.literal("")),
+  github: z.string().trim().optional().or(z.literal("")),
   website: z.string().trim().optional().or(z.literal("")),
 });
 
@@ -21,7 +29,7 @@ export const experienceInputSchema = z.object({
   rawDescription: z
     .string()
     .trim()
-    .min(20, "Agrega más contexto para que la IA pueda optimizarlo."),
+    .min(8, "Agrega una nota breve sobre lo que hiciste."),
 });
 
 export const educationInputSchema = z.object({

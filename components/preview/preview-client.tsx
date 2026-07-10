@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState, useTransition } from "react";
-import { ArrowLeft, Download, FileText, Loader2, Pencil } from "lucide-react";
+import { ArrowLeft, Download, FileText, Loader2, Pencil, SearchCheck } from "lucide-react";
 import { CvPreview } from "@/components/templates/cv-preview";
 import { TemplatePicker } from "@/components/templates/template-picker";
 import { Button } from "@/components/ui/button";
@@ -106,9 +106,15 @@ export function PreviewClient({ id }: { id: string }) {
           <span className="flex size-9 items-center justify-center rounded-md bg-primary text-primary-foreground">
             <FileText className="size-5" aria-hidden="true" />
           </span>
-          AI CV Studio
+          AI LaTeX CV Studio
         </Link>
         <div className="flex gap-2">
+          <Button asChild variant="ghost" size="sm">
+            <Link href="/analyze-job">
+              <SearchCheck className="size-4" aria-hidden="true" />
+              Oferta
+            </Link>
+          </Button>
           <Button asChild variant="ghost" size="sm">
             <Link href="/create">
               <ArrowLeft className="size-4" aria-hidden="true" />

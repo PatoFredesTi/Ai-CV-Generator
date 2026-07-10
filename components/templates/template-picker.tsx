@@ -12,6 +12,9 @@ const templates: Array<{
   { id: "classic", label: "Clásico", swatch: "bg-slate-900" },
   { id: "modern", label: "Moderno", swatch: "bg-primary" },
   { id: "minimal", label: "Minimal", swatch: "bg-secondary" },
+  { id: "ats", label: "ATS", swatch: "bg-emerald-700" },
+  { id: "developer", label: "Developer", swatch: "bg-sky-700" },
+  { id: "executive", label: "Executive", swatch: "bg-zinc-700" },
 ];
 
 export function TemplatePicker({
@@ -24,7 +27,7 @@ export function TemplatePicker({
   return (
     <div className="space-y-2">
       <p className="text-sm font-medium text-slate-900">Template</p>
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
         {templates.map((template) => {
           const selected = template.id === value;
 

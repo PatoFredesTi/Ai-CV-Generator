@@ -29,18 +29,80 @@ function cleanList(value: string) {
     .filter(Boolean);
 }
 
+function normalizeForCompare(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+}
+
+function stripBulletMarker(value: string) {
+  return value.replace(/^\s*[-*]\s*/, "").trim();
+}
+
+function ensureSentence(value: string) {
+  const trimmed = value.trim().replace(/\s+/g, " ");
+
+  if (!trimmed) {
+    return trimmed;
+  }
+
+  return /[.!?]$/.test(trimmed) ? trimmed : `${trimmed}.`;
+}
+
+function looksLikeCompleteBullet(value: string) {
+  const normalized = normalizeForCompare(stripBulletMarker(value));
+
+  return (
+    normalized.length >= 32 &&
+    /^(desarroll|implement|constru|optim|mejor|lider|colabor|reduj|aument|migr|automat|document|coordin|disen|cre|integr|logr|alcanc|apoy|gestion|resolvi|mantuv|entreg)/.test(
+      normalized,
+    )
+  );
+}
+
+function cleanExperienceFragments(value: string) {
+  const lineFragments = value
+    .split(/[\n;]/)
+    .map((item) => stripBulletMarker(item))
+    .filter(Boolean);
+
+  if (lineFragments.length > 1 || /^\s*[-*]/m.test(value)) {
+    return lineFragments;
+  }
+
+  return cleanList(value).map((item) => stripBulletMarker(item));
+}
+
 function capSkills(skills: string[]) {
   const merged = [...skills, ...defaultSkills];
   return Array.from(new Set(merged)).slice(0, 10);
 }
 
 function fallbackBullets(rawDescription: string, targetRole: string) {
-  const fragments = cleanList(rawDescription).slice(0, 3);
+  const fragments = cleanExperienceFragments(rawDescription).slice(0, 3);
 
   if (fragments.length > 0) {
-    return fragments.map((fragment) =>
-      fragment.length > 120 ? `${fragment.slice(0, 117)}...` : fragment,
-    );
+    return fragments.map((fragment, index) => {
+      const cleaned =
+        fragment.length > 140 && !looksLikeCompleteBullet(fragment)
+          ? `${fragment.slice(0, 137)}...`
+          : fragment;
+
+      if (looksLikeCompleteBullet(cleaned)) {
+        return ensureSentence(cleaned);
+      }
+
+      if (index === 0) {
+        return `Desarrolle ${cleaned}, alineando la ejecucion con objetivos del rol de ${targetRole}.`;
+      }
+
+      if (index === 1) {
+        return `Colabore con equipos internos para ejecutar ${cleaned}, manteniendo foco en calidad y entrega.`;
+      }
+
+      return `Optimice y documente avances relacionados con ${cleaned}, apoyando la mejora continua del equipo.`;
+    });
   }
 
   return [

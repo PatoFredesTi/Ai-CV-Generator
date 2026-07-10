@@ -23,6 +23,21 @@ const palette = {
     accent: "#0f766e",
     light: "#f8fafc",
   },
+  ats: {
+    primary: "#064e3b",
+    accent: "#334155",
+    light: "#f8fafc",
+  },
+  developer: {
+    primary: "#0f172a",
+    accent: "#0369a1",
+    light: "#f0f9ff",
+  },
+  executive: {
+    primary: "#18181b",
+    accent: "#52525b",
+    light: "#fafafa",
+  },
 };
 
 const styles = StyleSheet.create({
@@ -150,6 +165,7 @@ export function CvPdfDocument({ data }: { data: CVData }) {
             <Text>{data.personal.phone}</Text>
             <Text>{data.personal.location}</Text>
             {data.personal.linkedIn ? <Text>{data.personal.linkedIn}</Text> : null}
+            {data.personal.github ? <Text>{data.personal.github}</Text> : null}
             {data.personal.website ? <Text>{data.personal.website}</Text> : null}
           </View>
         </View>

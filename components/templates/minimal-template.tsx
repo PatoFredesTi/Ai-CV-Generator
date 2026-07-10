@@ -13,6 +13,7 @@ export function MinimalTemplate({ data }: { data: CVData }) {
           <p>{data.personal.phone}</p>
           <p>{data.personal.location}</p>
           {data.personal.linkedIn ? <p>{data.personal.linkedIn}</p> : null}
+          {data.personal.github ? <p>{data.personal.github}</p> : null}
           {data.personal.website ? <p>{data.personal.website}</p> : null}
         </div>
       </header>

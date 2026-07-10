@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, FileText } from "lucide-react";
+import { ArrowLeft, FileText, SearchCheck } from "lucide-react";
 import { CreateCvForm } from "@/components/form/create-cv-form";
 import { Button } from "@/components/ui/button";
 
@@ -11,14 +11,22 @@ export default function CreatePage() {
           <span className="flex size-9 items-center justify-center rounded-md bg-primary text-primary-foreground">
             <FileText className="size-5" aria-hidden="true" />
           </span>
-          AI CV Studio
+          AI LaTeX CV Studio
         </Link>
-        <Button asChild variant="ghost" size="sm">
-          <Link href="/">
-            <ArrowLeft className="size-4" aria-hidden="true" />
-            Inicio
-          </Link>
-        </Button>
+        <div className="flex gap-2">
+          <Button asChild variant="ghost" size="sm">
+            <Link href="/">
+              <ArrowLeft className="size-4" aria-hidden="true" />
+              Inicio
+            </Link>
+          </Button>
+          <Button asChild size="sm">
+            <Link href="/analyze-job">
+              <SearchCheck className="size-4" aria-hidden="true" />
+              Oferta
+            </Link>
+          </Button>
+        </div>
       </header>
 
       <section className="mx-auto w-full max-w-7xl px-5 pb-12">

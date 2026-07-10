@@ -1,4 +1,4 @@
-import { Mail, MapPin, Phone } from "lucide-react";
+import { Github, LinkIcon, Mail, MapPin, Phone } from "lucide-react";
 import { type CVData } from "@/lib/cv/schema";
 
 export function ClassicTemplate({ data }: { data: CVData }) {
@@ -20,6 +20,24 @@ export function ClassicTemplate({ data }: { data: CVData }) {
             <MapPin className="size-4" aria-hidden="true" />
             {data.personal.location}
           </span>
+          {data.personal.github ? (
+            <span className="inline-flex items-center gap-1">
+              <Github className="size-4" aria-hidden="true" />
+              {data.personal.github}
+            </span>
+          ) : null}
+          {data.personal.linkedIn ? (
+            <span className="inline-flex items-center gap-1">
+              <LinkIcon className="size-4" aria-hidden="true" />
+              {data.personal.linkedIn}
+            </span>
+          ) : null}
+          {data.personal.website ? (
+            <span className="inline-flex items-center gap-1">
+              <LinkIcon className="size-4" aria-hidden="true" />
+              {data.personal.website}
+            </span>
+          ) : null}
         </div>
       </header>
 

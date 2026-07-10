@@ -1,4 +1,4 @@
-import { Mail, MapPin, Phone } from "lucide-react";
+import { Github, LinkIcon, Mail, MapPin, Phone } from "lucide-react";
 import { type CVData } from "@/lib/cv/schema";
 
 export function ModernTemplate({ data }: { data: CVData }) {
@@ -21,6 +21,24 @@ export function ModernTemplate({ data }: { data: CVData }) {
             <MapPin className="mt-0.5 size-4" aria-hidden="true" />
             <span>{data.personal.location}</span>
           </p>
+          {data.personal.github ? (
+            <p className="flex items-start gap-2">
+              <Github className="mt-0.5 size-4" aria-hidden="true" />
+              <span>{data.personal.github}</span>
+            </p>
+          ) : null}
+          {data.personal.linkedIn ? (
+            <p className="flex items-start gap-2">
+              <LinkIcon className="mt-0.5 size-4" aria-hidden="true" />
+              <span>{data.personal.linkedIn}</span>
+            </p>
+          ) : null}
+          {data.personal.website ? (
+            <p className="flex items-start gap-2">
+              <LinkIcon className="mt-0.5 size-4" aria-hidden="true" />
+              <span>{data.personal.website}</span>
+            </p>
+          ) : null}
         </div>
 
         <section className="mt-9">

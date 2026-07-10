@@ -8,6 +8,7 @@ export const demoInput: CVInput = {
     phone: "+56 9 1234 5678",
     location: "Santiago, Chile",
     linkedIn: "linkedin.com/in/patricioherrera",
+    github: "github.com/patricioherrera",
     website: "patricio.dev",
   },
   targetRole: "Frontend Developer",

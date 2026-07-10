@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Generador de CVs con IA",
+  title: "AI LaTeX CV Studio",
   description: "MVP de portafolio con Next.js 15, IA y generación de PDF.",
 };
 

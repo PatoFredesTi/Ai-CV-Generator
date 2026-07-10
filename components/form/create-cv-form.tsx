@@ -24,6 +24,7 @@ const emptyValues: CVInputFormValues = {
     phone: "",
     location: "",
     linkedIn: "",
+    github: "",
     website: "",
   },
   targetRole: "",
@@ -58,6 +59,41 @@ const steps = [
 
 const HISTORY_KEY = "cv-history";
 const COUNT_KEY = "cv-generated-count";
+const EXPERIENCE_IMPROVE_CACHE_PREFIX = "cv-experience-improve-v2";
+
+type ImproveMode = "fast" | "polish";
+
+type ImproveExperienceApiResult = {
+  improvedDescription: string;
+  warnings?: string[];
+  provider?: "openai" | "demo";
+  model?: string;
+  mode?: ImproveMode;
+};
+
+function splitKeywords(value: string) {
+  return value
+    .split(/[,;\n]/)
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .slice(0, 8);
+}
+
+function hashString(value: string) {
+  let hash = 5381;
+
+  for (let index = 0; index < value.length; index += 1) {
+    hash = (hash * 33) ^ value.charCodeAt(index);
+  }
+
+  return (hash >>> 0).toString(36);
+}
+
+function createImproveCacheKey(payload: unknown) {
+  return `${EXPERIENCE_IMPROVE_CACHE_PREFIX}:${hashString(
+    JSON.stringify(payload),
+  )}`;
+}
 
 function persistCv(cv: CVData) {
   const current = window.localStorage.getItem(HISTORY_KEY);
@@ -100,8 +136,17 @@ export function CreateCvForm() {
     control,
     formState: { errors },
     setValue,
+    getValues,
     watch,
   } = form;
+  const [improvingIndex, setImprovingIndex] = useState<number | null>(null);
+  const [improveMode, setImproveMode] = useState<ImproveMode>("fast");
+  const [experienceImproveWarnings, setExperienceImproveWarnings] = useState<
+    Record<number, string[]>
+  >({});
+  const [experienceImproveMeta, setExperienceImproveMeta] = useState<
+    Record<number, string>
+  >({});
 
   const experienceFields = useFieldArray({
     control,
@@ -188,6 +233,99 @@ export function CreateCvForm() {
     setProvider(null);
     setFormError(null);
     setStep(3);
+  };
+
+  const applyImprovedExperience = (
+    index: number,
+    payload: ImproveExperienceApiResult,
+    source: string,
+  ) => {
+    setValue(
+      `experience.${index}.rawDescription`,
+      payload.improvedDescription,
+      {
+        shouldDirty: true,
+        shouldValidate: true,
+      },
+    );
+    setExperienceImproveWarnings((current) => ({
+      ...current,
+      [index]: payload.warnings ?? [],
+    }));
+    setExperienceImproveMeta((current) => ({
+      ...current,
+      [index]: source,
+    }));
+  };
+
+  const improveExperience = async (index: number) => {
+    const experience = getValues(`experience.${index}`);
+    const rawDescription = experience.rawDescription.trim();
+
+    if (rawDescription.length < 8) {
+      setFormError("Agrega una nota breve antes de mejorar la redaccion.");
+      return;
+    }
+
+    setFormError(null);
+    setImprovingIndex(index);
+
+    try {
+      const requestPayload = {
+        rawDescription,
+        role: experience.role,
+        company: experience.company,
+        targetRole: getValues("targetRole"),
+        language: getValues("language"),
+        mode: improveMode,
+        targetKeywords: splitKeywords(getValues("rawSkills") ?? ""),
+      };
+      const cacheKey = createImproveCacheKey(requestPayload);
+      const cachedValue = window.localStorage.getItem(cacheKey);
+
+      if (cachedValue) {
+        try {
+          const cachedPayload = JSON.parse(
+            cachedValue,
+          ) as ImproveExperienceApiResult;
+
+          applyImprovedExperience(index, cachedPayload, "Cache local");
+          return;
+        } catch {
+          window.localStorage.removeItem(cacheKey);
+        }
+      }
+
+      const response = await fetch("/api/improve-experience", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestPayload),
+      });
+      const payload = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        setFormError(payload?.message ?? "No se pudo mejorar la experiencia.");
+        return;
+      }
+
+      const source =
+        payload.provider === "openai"
+          ? `OpenAI${payload.model ? ` · ${payload.model}` : ""}`
+          : "Demo";
+
+      try {
+        window.localStorage.setItem(cacheKey, JSON.stringify(payload));
+      } catch {
+        // Cache is only a cost optimization; the rewrite should still apply.
+      }
+      applyImprovedExperience(index, payload, source);
+    } catch {
+      setFormError("No se pudo mejorar la experiencia.");
+    } finally {
+      setImprovingIndex(null);
+    }
   };
 
   const submit = async () => {
@@ -290,6 +428,9 @@ export function CreateCvForm() {
             <Field label="LinkedIn">
               <Input placeholder="linkedin.com/in/patricio" {...register("personal.linkedIn")} />
             </Field>
+            <Field label="GitHub">
+              <Input placeholder="github.com/patricio" {...register("personal.github")} />
+            </Field>
             <Field label="Sitio web">
               <Input placeholder="patricio.dev" {...register("personal.website")} />
             </Field>
@@ -357,9 +498,64 @@ export function CreateCvForm() {
                       error={errors.experience?.[index]?.rawDescription?.message}
                     >
                       <Textarea
-                        placeholder="Responsabilidades, logros, métricas, tecnologías..."
+                        placeholder="Notas breves: hice dashboard en React, conecte APIs, mejore carga, trabaje con producto..."
                         {...register(`experience.${index}.rawDescription`)}
                       />
+                      <div className="mt-2 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                        <div
+                          className="inline-flex w-fit rounded-md border bg-white p-1"
+                          role="group"
+                          aria-label="Modo de redaccion"
+                        >
+                          {(["fast", "polish"] as const).map((mode) => (
+                            <button
+                              key={mode}
+                              type="button"
+                              aria-pressed={improveMode === mode}
+                              title={
+                                mode === "fast"
+                                  ? "Redaccion rapida"
+                                  : "Pulido profesional"
+                              }
+                              className={cn(
+                                "h-8 rounded px-3 text-xs font-medium transition-colors",
+                                improveMode === mode
+                                  ? "bg-primary text-primary-foreground"
+                                  : "text-muted-foreground hover:bg-muted",
+                              )}
+                              onClick={() => setImproveMode(mode)}
+                            >
+                              {mode === "fast" ? "Rapido" : "Pulir"}
+                            </button>
+                          ))}
+                        </div>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => void improveExperience(index)}
+                          disabled={improvingIndex === index}
+                        >
+                          {improvingIndex === index ? (
+                            <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+                          ) : (
+                            <Sparkles className="size-4" aria-hidden="true" />
+                          )}
+                          Redactar con IA
+                        </Button>
+                      </div>
+                      {experienceImproveMeta[index] ? (
+                        <p className="mt-2 text-xs text-muted-foreground">
+                          {experienceImproveMeta[index]}
+                        </p>
+                      ) : null}
+                      {experienceImproveWarnings[index]?.length ? (
+                        <div className="mt-2 space-y-1 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
+                          {experienceImproveWarnings[index].map((warning) => (
+                            <p key={warning}>{warning}</p>
+                          ))}
+                        </div>
+                      ) : null}
                     </Field>
                   </div>
                 </div>

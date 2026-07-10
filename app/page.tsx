@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, FileText, Sparkles } from "lucide-react";
+import { ArrowRight, FileText, SearchCheck, Sparkles } from "lucide-react";
 import { GeneratedCounter } from "@/components/generated-counter";
 import { Button } from "@/components/ui/button";
 import { CvPreview } from "@/components/templates/cv-preview";
@@ -13,9 +13,12 @@ export default function HomePage() {
           <span className="flex size-9 items-center justify-center rounded-md bg-primary text-primary-foreground">
             <FileText className="size-5" aria-hidden="true" />
           </span>
-          AI CV Studio
+          AI LaTeX CV Studio
         </Link>
         <nav className="flex items-center gap-2">
+          <Button asChild variant="ghost" size="sm">
+            <Link href="/analyze-job">Analizar oferta</Link>
+          </Button>
           <Button asChild variant="ghost" size="sm">
             <Link href="/preview/demo">Demo</Link>
           </Button>
@@ -32,13 +35,14 @@ export default function HomePage() {
         <div className="pt-6 lg:pt-14">
           <div className="mb-5 inline-flex items-center gap-2 rounded-md border bg-white px-3 py-2 text-sm font-medium text-muted-foreground shadow-sm">
             <Sparkles className="size-4 text-primary" aria-hidden="true" />
-            Next.js 15 + OpenAI + PDF
+            Next.js 15 + OpenAI + LaTeX
           </div>
           <h1 className="max-w-3xl text-5xl font-semibold tracking-normal text-slate-950 md:text-6xl">
-            Generador de CVs con IA
+            AI LaTeX CV Studio
           </h1>
           <p className="mt-5 max-w-2xl text-lg leading-8 text-muted-foreground">
-            Captura experiencia, optimiza contenido profesional y exporta un PDF listo para postular.
+            Crea tu CV, analiza una oferta laboral, mide compatibilidad y genera
+            una version LaTeX lista para postular con foco ATS.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Button asChild size="lg">
@@ -48,7 +52,10 @@ export default function HomePage() {
               </Link>
             </Button>
             <Button asChild variant="outline" size="lg">
-              <Link href="/preview/demo">Ver demo</Link>
+              <Link href="/analyze-job">
+                <SearchCheck className="size-4" aria-hidden="true" />
+                Analizar oferta
+              </Link>
             </Button>
           </div>
 
@@ -62,13 +69,13 @@ export default function HomePage() {
               </p>
             </div>
             <div className="px-4 py-4">
-              <p className="text-2xl font-semibold text-slate-950">3</p>
+              <p className="text-2xl font-semibold text-slate-950">100</p>
               <p className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
-                Templates
+                Score
               </p>
             </div>
             <div className="px-4 py-4">
-              <p className="text-2xl font-semibold text-slate-950">PDF</p>
+              <p className="text-2xl font-semibold text-slate-950">TEX</p>
               <p className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
                 Export
               </p>

@@ -23,6 +23,7 @@ function buildPrompt(input: CVInput) {
 - Cargo objetivo: ${input.targetRole}
 - Idioma: ${input.language}
 - Tono: ${input.tone}
+- GitHub: ${input.personal.github || "no informado"}
 - Experiencia:
 ${input.experience
   .map(
@@ -35,11 +36,18 @@ ${input.experience
     .join("; ")}
 - Habilidades mencionadas: ${input.rawSkills}
 
+Instrucciones de redaccion:
+- Si la experiencia raw es breve, conviertela en bullets profesionales sin inventar datos.
+- Usa verbos de accion, alcance, tecnologias mencionadas y resultados cuando existan.
+- No inventes metricas, empresas, cargos, certificaciones, anos ni tecnologias.
+- Si no hay metricas, enfoca el impacto en claridad, colaboracion, calidad, entrega o mejora de procesos.
+- Ajusta el lenguaje al cargo objetivo y a las habilidades mencionadas.
+
 Genera JSON válido con esta forma exacta:
 {
   "summary": "resumen profesional de máximo 3 oraciones",
   "experience": [
-    { "bullets": ["bullet optimizado con logro o impacto", "bullet optimizado"] }
+    { "bullets": ["2 a 4 bullets optimizados con accion, contexto e impacto real"] }
   ],
   "skills": ["8 a 10 habilidades técnicas y blandas relevantes"]
 }`;
